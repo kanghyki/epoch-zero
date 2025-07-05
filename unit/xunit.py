@@ -17,6 +17,7 @@ class TestResult:
         self.failureCount = 0
         self.wasTearDownBroken = False
         self.wasSetUpBroken = False
+        self.str_error_msg = ''
 
     def testStarted(self):
         self.runCount = self.runCount + 1
@@ -38,6 +39,12 @@ class TestResult:
             sum = sum + ", TearDown was broken"
         return sum
 
+    def add_error_msg(self, e):
+        self.str_error_msg = self.str_error_msg + str(e) + '\n'
+
+    def error_msg(self):
+        return self.str_error_msg
+
 class TestCase:
     def __init__(self, name):
         self.name = name
@@ -51,20 +58,30 @@ class TestCase:
     def run(self, result):
         result.testStarted()
         try:
-            self.setUp()
-        except Exception as e:
-            result.setUpBroken()
-            traceback.print_exc()
-        try:
+            try:
+                self.setUp()
+            except Exception as e:
+                result.setUpBroken()
+                # fmt = traceback.format_exc()
+                result.add_error_msg(e)
+                raise
+
             method = getattr(self, self.name)
             method()
+
         except:
             result.testFailed()
+
         try:
             self.tearDown()
-        except:
+        except Exception as e:
             result.tearDownBroken()
-            traceback.print_exc()
+            # fmt = traceback.format_exc()
+            result.add_error_msg(e)
+
+######################################
+#                                    #
+######################################
 
 class WasRun(TestCase):
     def __init__(self, name):
@@ -126,12 +143,14 @@ class TestCaseTest(TestCase):
         result = TestResult()
         test.run(result)
         assert("1 run, 0 failed, TearDown was broken" == result.summary())
+        assert("teardown broken!\n" == result.error_msg())
 
     def testBrokenSetUp(self):
         test = TestBrokenSetUp("testMethod")
         result = TestResult()
         test.run(result)
-        assert("1 run, 0 failed, SetUp was broken" == result.summary())
+        assert("1 run, 1 failed, SetUp was broken" == result.summary())
+        assert("setup broken!\n" == result.error_msg())
 
 class TestBrokenTearDown(TestCase):
     def tearDown(self):
