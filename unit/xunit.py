@@ -1,5 +1,6 @@
 class TestCase:
     def __init__(self, name):
+        print(f'hello {name}')
         self.name = name
 
     def run(self):
@@ -19,7 +20,11 @@ class WasRun(TestCase):
         method = getattr(self, self.name)
         method()
 
-test = WasRun("testMethod")
-assert test.wasRun == None
-test.run()
-assert test.wasRun == True
+class TestCaseTest(TestCase):
+    def testRunning(self):
+        test = WasRun("testMethod")
+        assert(not test.wasRun)
+        test.run()
+        assert(test.wasRun)
+
+TestCaseTest("testRunning").run()
