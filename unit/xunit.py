@@ -152,6 +152,20 @@ class TestCaseTest(TestCase):
         assert("1 run, 1 failed, SetUp was broken" == result.summary())
         assert("setup broken!\n" == result.error_msg())
 
+    def testResultDetail(self):
+        result = TestResult()
+        suite = TestSuite()
+        suite.add(WasRun("testMethod"))
+        suite.add(WasRun("testMethod"))
+        suite.add(WasRun("testMethod"))
+        suite.run(result)
+
+        assert("3 run, 0 failed" == result.summary())
+        assert('''[pass] WasRun > testMethod
+[pass] WasRun > testMethod
+[pass] WasRun > testMethod
+''' == result.detail())
+
 class TestBrokenTearDown(TestCase):
     def tearDown(self):
         raise Exception('teardown broken!')
@@ -175,6 +189,7 @@ suite.add(TestCaseTest("testFailedResult"))
 suite.add(TestCaseTest("testSuite"))
 suite.add(TestCaseTest("testBrokenTearDown"))
 suite.add(TestCaseTest("testBrokenSetUp"))
+suite.add(TestCaseTest("testResultDetail"))
 
 result = TestResult()
 suite.run(result)
