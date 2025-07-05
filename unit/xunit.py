@@ -18,11 +18,17 @@ class TestResult:
         self.wasTearDownBroken = False
         self.wasSetUpBroken = False
         self.str_error_msg = ''
+        self.failure_indices = []
+        self.classNames = []
+        self.methodNames = []
 
-    def testStarted(self):
+    def testStarted(self, className, methodName):
+        self.classNames.append(className)
+        self.methodNames.append(methodName)
         self.runCount = self.runCount + 1
 
     def testFailed(self):
+        self.failure_indices.append(self.runCount - 1)
         self.failureCount = self.failureCount + 1
 
     def tearDownBroken(self):
@@ -38,6 +44,17 @@ class TestResult:
         if self.wasTearDownBroken:
             sum = sum + ", TearDown was broken"
         return sum
+
+    def detail(self):
+        det = ''
+        for i in range(0, self.runCount):
+            ret = ''
+            if i in self.failure_indices:
+                ret = 'failed'
+            else:
+                ret = 'pass'
+            det = det + f"[{ret:^8}] {self.classNames[i]} > {self.methodNames[i]}\n"
+        return det;
 
     def add_error_msg(self, e):
         self.str_error_msg = self.str_error_msg + str(e) + '\n'
@@ -56,7 +73,7 @@ class TestCase:
         pass
 
     def run(self, result):
-        result.testStarted()
+        result.testStarted(self.__class__.__name__, self.name)
         try:
             try:
                 self.setUp()
@@ -80,7 +97,7 @@ class TestCase:
             result.add_error_msg(e)
 
 ######################################
-#                                    #
+#       Test Classes                 #
 ######################################
 
 class WasRun(TestCase):
@@ -126,7 +143,7 @@ class TestCaseTest(TestCase):
 
     def testFailedResultFormatting(self):
         result = TestResult()
-        result.testStarted()
+        result.testStarted('class', 'method')
         result.testFailed()
         assert("1 run, 1 failed" == result.summary())
 
@@ -158,12 +175,14 @@ class TestCaseTest(TestCase):
         suite.add(WasRun("testMethod"))
         suite.add(WasRun("testMethod"))
         suite.add(WasRun("testMethod"))
+        suite.add(WasRun("testBrokenMethod"))
         suite.run(result)
 
-        assert("3 run, 0 failed" == result.summary())
-        assert('''[pass] WasRun > testMethod
-[pass] WasRun > testMethod
-[pass] WasRun > testMethod
+        assert("4 run, 1 failed" == result.summary())
+        assert('''[  pass  ] WasRun > testMethod
+[  pass  ] WasRun > testMethod
+[  pass  ] WasRun > testMethod
+[ failed ] WasRun > testBrokenMethod
 ''' == result.detail())
 
 class TestBrokenTearDown(TestCase):
@@ -193,4 +212,5 @@ suite.add(TestCaseTest("testResultDetail"))
 
 result = TestResult()
 suite.run(result)
+print(result.detail())
 print(result.summary())
