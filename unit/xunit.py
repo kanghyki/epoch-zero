@@ -1,12 +1,27 @@
-class TestResult():
+class TestSuite:
+    def __init__(self):
+        self.tests = []
+
+    def add(self, test):
+        self.tests.append(test)
+
+    def run(self, result):
+        for test in self.tests:
+            test.run(result)
+
+class TestResult:
     def __init__(self):
         self.runCount = 0
+        self.failureCount = 0
 
     def testStarted(self):
         self.runCount = self.runCount + 1
 
+    def testFailed(self):
+        self.failureCount = self.failureCount + 1
+
     def summary(self):
-        return f"{self.runCount} run, 0 failed"
+        return f"{self.runCount} run, {self.failureCount} failed"
 
 class TestCase:
     def __init__(self, name):
@@ -18,14 +33,15 @@ class TestCase:
     def tearDown(self):
         pass
 
-    def run(self):
-        result = TestResult()
+    def run(self, result):
         result.testStarted()
         self.setUp()
-        method = getattr(self, self.name)
-        method()
+        try:
+            method = getattr(self, self.name)
+            method()
+        except:
+            result.testFailed()
         self.tearDown()
-        return result
 
 class WasRun(TestCase):
     def __init__(self, name):
@@ -50,29 +66,45 @@ class WasRun(TestCase):
         self.log = self.log + "tearDown "
 
 class TestCaseTest(TestCase):
-    def testRunning(self):
-        test = WasRun("testMethod")
-        assert(not test.wasRun)
-        test.run()
-        assert(test.wasRun)
-
     def testTemplateMethod(self):
         test = WasRun("testMethod")
-        test.run()
+        result = TestResult()
+        test.run(result)
         assert("setUp testMethod tearDown " == test.log)
 
     def testResult(self):
         test = WasRun("testMethod")
-        result = test.run()
+        result = TestResult()
+        test.run(result)
         assert("1 run, 0 failed" == result.summary())
 
     def testFailedResult(self):
         test = WasRun("testBrokenMethod")
-        result = test.run()
+        result = TestResult()
+        test.run(result)
         assert("1 run, 1 failed" == result.summary())
 
+    def testFailedResultFormatting(self):
+        result = TestResult()
+        result.testStarted()
+        result.testFailed()
+        assert("1 run, 1 failed" == result.summary())
 
-TestCaseTest("testRunning").run()
-TestCaseTest("testTemplateMethod").run()
-TestCaseTest("testResult").run()
-TestCaseTest("testFailedResult").run()
+    def testSuite(self):
+        suite = TestSuite()
+        suite.add(WasRun("testMethod"))
+        suite.add(WasRun("testBrokenMethod"))
+        result = TestResult()
+        suite.run(result)
+        assert("2 run, 1 failed" == result.summary())
+
+
+suite = TestSuite()
+suite.add(TestCaseTest("testTemplateMethod"))
+suite.add(TestCaseTest("testResult"))
+suite.add(TestCaseTest("testFailedResultFormatting"))
+suite.add(TestCaseTest("testFailedResult"))
+suite.add(TestCaseTest("testSuite"))
+result = TestResult()
+suite.run(result)
+print(result.summary())
