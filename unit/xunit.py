@@ -13,47 +13,45 @@ class TestSuite:
 
 class TestResult:
     def __init__(self):
-        self.runCount = 0
-        self.failureCount = 0
-        self.wasTearDownBroken = False
-        self.wasSetUpBroken = False
+        self.run_count = 0
+        self.was_tear_down_broken = False
+        self.was_setup_broken = False
         self.str_error_msg = ''
         self.failure_indices = []
-        self.classNames = []
-        self.methodNames = []
+        self.class_names = []
+        self.method_names = []
 
-    def testStarted(self, className, methodName):
-        self.classNames.append(className)
-        self.methodNames.append(methodName)
-        self.runCount = self.runCount + 1
+    def test_started(self, className, methodName):
+        self.class_names.append(className)
+        self.method_names.append(methodName)
+        self.run_count = self.run_count + 1
 
-    def testFailed(self):
-        self.failure_indices.append(self.runCount - 1)
-        self.failureCount = self.failureCount + 1
+    def test_failed(self):
+        self.failure_indices.append(self.run_count - 1)
 
-    def tearDownBroken(self):
-        self.wasTearDownBroken = True
+    def teardown_broken(self):
+        self.was_tear_down_broken = True
 
-    def setUpBroken(self):
-        self.wasSetUpBroken = True
+    def setup_broken(self):
+        self.was_setup_broken = True
 
     def summary(self):
-        sum = f"{self.runCount} run, {self.failureCount} failed"
-        if self.wasSetUpBroken:
+        sum = f"{self.run_count} run, {len(self.failure_indices)} failed"
+        if self.was_setup_broken:
             sum = sum + ", SetUp was broken"
-        if self.wasTearDownBroken:
+        if self.was_tear_down_broken:
             sum = sum + ", TearDown was broken"
         return sum
 
     def detail(self):
         det = ''
-        for i in range(0, self.runCount):
+        for i in range(0, self.run_count):
             ret = ''
             if i in self.failure_indices:
                 ret = 'failed'
             else:
                 ret = 'pass'
-            det = det + f"[{ret:^8}] {self.classNames[i]} > {self.methodNames[i]}\n"
+            det = det + f"[{ret:^8}] {self.class_names[i]} > {self.method_names[i]}\n"
         return det;
 
     def add_error_msg(self, e):
@@ -66,19 +64,19 @@ class TestCase:
     def __init__(self, name):
         self.name = name
 
-    def setUp(self):
+    def setup(self):
         pass
 
-    def tearDown(self):
+    def teardown(self):
         pass
 
     def run(self, result):
-        result.testStarted(self.__class__.__name__, self.name)
+        result.test_started(self.__class__.__name__, self.name)
         try:
             try:
-                self.setUp()
+                self.setup()
             except Exception as e:
-                result.setUpBroken()
+                result.setup_broken()
                 # fmt = traceback.format_exc()
                 result.add_error_msg(e)
                 raise
@@ -87,11 +85,11 @@ class TestCase:
             method()
 
         except:
-            result.testFailed()
+            result.test_failed()
 
         try:
-            self.tearDown()
+            self.teardown()
         except Exception as e:
-            result.tearDownBroken()
+            result.teardown_broken()
             # fmt = traceback.format_exc()
             result.add_error_msg(e)

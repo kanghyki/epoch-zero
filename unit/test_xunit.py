@@ -11,108 +11,108 @@ class WasRun(TestCase):
         self.wasSetUp = None
         TestCase.__init__(self, name)
 
-    def testMethod(self):
+    def test_method(self):
         self.wasRun = True
-        self.log = self.log + "testMethod "
+        self.log = self.log + "test_method "
 
-    def testBrokenMethod(self):
+    def test_broken_method(self):
         raise Exception
 
-    def setUp(self):
+    def setup(self):
         self.wasRun = None
         self.wasSetUp = True
-        self.log = "setUp "
+        self.log = "setup "
 
-    def tearDown(self):
-        self.log = self.log + "tearDown "
+    def teardown(self):
+        self.log = self.log + "teardown "
 
 class TestCaseTest(TestCase):
-    def testTemplateMethod(self):
-        test = WasRun("testMethod")
+    def test_template_method(self):
+        test = WasRun("test_method")
         result = TestResult()
         test.run(result)
-        assert("setUp testMethod tearDown " == test.log)
+        assert("setup test_method teardown " == test.log)
 
-    def testResult(self):
-        test = WasRun("testMethod")
+    def test_result(self):
+        test = WasRun("test_method")
         result = TestResult()
         test.run(result)
         assert("1 run, 0 failed" == result.summary())
 
-    def testFailedResult(self):
-        test = WasRun("testBrokenMethod")
+    def test_failed_result(self):
+        test = WasRun("test_broken_method")
         result = TestResult()
         test.run(result)
         assert("1 run, 1 failed" == result.summary())
 
-    def testFailedResultFormatting(self):
+    def test_failed_resultFormatting(self):
         result = TestResult()
-        result.testStarted('class', 'method')
-        result.testFailed()
+        result.test_started('class', 'method')
+        result.test_failed()
         assert("1 run, 1 failed" == result.summary())
 
-    def testSuite(self):
+    def test_suite(self):
         suite = TestSuite()
-        suite.add(WasRun("testMethod"))
-        suite.add(WasRun("testBrokenMethod"))
+        suite.add(WasRun("test_method"))
+        suite.add(WasRun("test_broken_method"))
         result = TestResult()
         suite.run(result)
         assert("2 run, 1 failed" == result.summary())
 
-    def testBrokenTearDown(self):
-        test = TestBrokenTearDown("testMethod")
+    def test_broken_teardown(self):
+        test = TestBrokenTearDown("test_method")
         result = TestResult()
         test.run(result)
         assert("1 run, 0 failed, TearDown was broken" == result.summary())
         assert("teardown broken!\n" == result.error_msg())
 
-    def testBrokenSetUp(self):
-        test = TestBrokenSetUp("testMethod")
+    def test_broken_setup(self):
+        test = TestBrokenSetUp("test_method")
         result = TestResult()
         test.run(result)
         assert("1 run, 1 failed, SetUp was broken" == result.summary())
         assert("setup broken!\n" == result.error_msg())
 
-    def testResultDetail(self):
+    def test_result_detail(self):
         result = TestResult()
         suite = TestSuite()
-        suite.add(WasRun("testMethod"))
-        suite.add(WasRun("testMethod"))
-        suite.add(WasRun("testMethod"))
-        suite.add(WasRun("testBrokenMethod"))
+        suite.add(WasRun("test_method"))
+        suite.add(WasRun("test_method"))
+        suite.add(WasRun("test_method"))
+        suite.add(WasRun("test_broken_method"))
         suite.run(result)
 
         assert("4 run, 1 failed" == result.summary())
-        assert('''[  pass  ] WasRun > testMethod
-[  pass  ] WasRun > testMethod
-[  pass  ] WasRun > testMethod
-[ failed ] WasRun > testBrokenMethod
+        assert('''[  pass  ] WasRun > test_method
+[  pass  ] WasRun > test_method
+[  pass  ] WasRun > test_method
+[ failed ] WasRun > test_broken_method
 ''' == result.detail())
 
 class TestBrokenTearDown(TestCase):
-    def tearDown(self):
+    def teardown(self):
         raise Exception('teardown broken!')
 
-    def testMethod(self):
+    def test_method(self):
         pass
 
 class TestBrokenSetUp(TestCase):
-    def setUp(self):
+    def setup(self):
         raise Exception('setup broken!')
 
-    def testMethod(self):
+    def test_method(self):
         pass
 
 suite = TestSuite()
 
-suite.add(TestCaseTest("testTemplateMethod"))
-suite.add(TestCaseTest("testResult"))
-suite.add(TestCaseTest("testFailedResultFormatting"))
-suite.add(TestCaseTest("testFailedResult"))
-suite.add(TestCaseTest("testSuite"))
-suite.add(TestCaseTest("testBrokenTearDown"))
-suite.add(TestCaseTest("testBrokenSetUp"))
-suite.add(TestCaseTest("testResultDetail"))
+suite.add(TestCaseTest("test_template_method"))
+suite.add(TestCaseTest("test_result"))
+suite.add(TestCaseTest("test_failed_resultFormatting"))
+suite.add(TestCaseTest("test_failed_result"))
+suite.add(TestCaseTest("test_suite"))
+suite.add(TestCaseTest("test_broken_teardown"))
+suite.add(TestCaseTest("test_broken_setup"))
+suite.add(TestCaseTest("test_result_detail"))
 
 result = TestResult()
 suite.run(result)
