@@ -1,3 +1,5 @@
+import traceback
+
 class TestSuite:
     def __init__(self):
         self.tests = []
@@ -14,6 +16,7 @@ class TestResult:
         self.runCount = 0
         self.failureCount = 0
         self.wasTearDownBroken = False
+        self.wasSetUpBroken = False
 
     def testStarted(self):
         self.runCount = self.runCount + 1
@@ -24,8 +27,13 @@ class TestResult:
     def tearDownBroken(self):
         self.wasTearDownBroken = True
 
+    def setUpBroken(self):
+        self.wasSetUpBroken = True
+
     def summary(self):
         sum = f"{self.runCount} run, {self.failureCount} failed"
+        if self.wasSetUpBroken:
+            sum = sum + ", SetUp was broken"
         if self.wasTearDownBroken:
             sum = sum + ", TearDown was broken"
         return sum
@@ -42,7 +50,11 @@ class TestCase:
 
     def run(self, result):
         result.testStarted()
-        self.setUp()
+        try:
+            self.setUp()
+        except Exception as e:
+            result.setUpBroken()
+            traceback.print_exc()
         try:
             method = getattr(self, self.name)
             method()
@@ -52,6 +64,7 @@ class TestCase:
             self.tearDown()
         except:
             result.tearDownBroken()
+            traceback.print_exc()
 
 class WasRun(TestCase):
     def __init__(self, name):
@@ -114,13 +127,25 @@ class TestCaseTest(TestCase):
         test.run(result)
         assert("1 run, 0 failed, TearDown was broken" == result.summary())
 
+    def testBrokenSetUp(self):
+        test = TestBrokenSetUp("testMethod")
+        result = TestResult()
+        test.run(result)
+        assert("1 run, 0 failed, SetUp was broken" == result.summary())
+
 class TestBrokenTearDown(TestCase):
     def tearDown(self):
-        raise Exception
+        raise Exception('teardown broken!')
 
     def testMethod(self):
         pass
 
+class TestBrokenSetUp(TestCase):
+    def setUp(self):
+        raise Exception('setup broken!')
+
+    def testMethod(self):
+        pass
 
 suite = TestSuite()
 
@@ -130,6 +155,7 @@ suite.add(TestCaseTest("testFailedResultFormatting"))
 suite.add(TestCaseTest("testFailedResult"))
 suite.add(TestCaseTest("testSuite"))
 suite.add(TestCaseTest("testBrokenTearDown"))
+suite.add(TestCaseTest("testBrokenSetUp"))
 
 result = TestResult()
 suite.run(result)
