@@ -13,6 +13,7 @@ class TestResult:
     def __init__(self):
         self.runCount = 0
         self.failureCount = 0
+        self.wasTearDownBroken = False
 
     def testStarted(self):
         self.runCount = self.runCount + 1
@@ -20,8 +21,14 @@ class TestResult:
     def testFailed(self):
         self.failureCount = self.failureCount + 1
 
+    def tearDownBroken(self):
+        self.wasTearDownBroken = True
+
     def summary(self):
-        return f"{self.runCount} run, {self.failureCount} failed"
+        sum = f"{self.runCount} run, {self.failureCount} failed"
+        if self.wasTearDownBroken:
+            sum = sum + ", TearDown was broken"
+        return sum
 
 class TestCase:
     def __init__(self, name):
@@ -41,7 +48,10 @@ class TestCase:
             method()
         except:
             result.testFailed()
-        self.tearDown()
+        try:
+            self.tearDown()
+        except:
+            result.tearDownBroken()
 
 class WasRun(TestCase):
     def __init__(self, name):
@@ -98,13 +108,29 @@ class TestCaseTest(TestCase):
         suite.run(result)
         assert("2 run, 1 failed" == result.summary())
 
+    def testBrokenTearDown(self):
+        test = TestBrokenTearDown("testMethod")
+        result = TestResult()
+        test.run(result)
+        assert("1 run, 0 failed, TearDown was broken" == result.summary())
+
+class TestBrokenTearDown(TestCase):
+    def tearDown(self):
+        raise Exception
+
+    def testMethod(self):
+        pass
+
 
 suite = TestSuite()
+
 suite.add(TestCaseTest("testTemplateMethod"))
 suite.add(TestCaseTest("testResult"))
 suite.add(TestCaseTest("testFailedResultFormatting"))
 suite.add(TestCaseTest("testFailedResult"))
 suite.add(TestCaseTest("testSuite"))
+suite.add(TestCaseTest("testBrokenTearDown"))
+
 result = TestResult()
 suite.run(result)
 print(result.summary())
