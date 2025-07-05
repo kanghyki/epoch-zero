@@ -54,12 +54,6 @@ class TestResult:
             det = det + f"[{ret:^8}] {self.class_names[i]} > {self.method_names[i]}\n"
         return det;
 
-    def add_error_msg(self, e):
-        self.str_error_msg = self.str_error_msg + str(e) + '\n'
-
-    def error_msg(self):
-        return self.str_error_msg
-
 class TestCase:
     def __init__(self, name):
         self.name = name
@@ -77,8 +71,8 @@ class TestCase:
                 self.setup()
             except Exception as e:
                 result.setup_broken()
-                # fmt = traceback.format_exc()
-                result.add_error_msg(e)
+                fmt = traceback.format_exc()
+                print(f"{self.__class__.__name__} > {self.name}\n", fmt)
                 raise
 
             method = getattr(self, self.name)
@@ -91,5 +85,5 @@ class TestCase:
             self.teardown()
         except Exception as e:
             result.teardown_broken()
-            # fmt = traceback.format_exc()
-            result.add_error_msg(e)
+            fmt = traceback.format_exc()
+            print(f"{self.__class__.__name__} > {self.name}\n", fmt)

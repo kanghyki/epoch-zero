@@ -64,14 +64,12 @@ class TestCaseTest(TestCase):
         result = TestResult()
         test.run(result)
         assert("1 run, 0 failed, TearDown was broken" == result.summary())
-        assert("teardown broken!\n" == result.error_msg())
 
     def test_broken_setup(self):
         test = TestBrokenSetUp("test_method")
         result = TestResult()
         test.run(result)
         assert("1 run, 1 failed, SetUp was broken" == result.summary())
-        assert("setup broken!\n" == result.error_msg())
 
     def test_result_detail(self):
         result = TestResult()
@@ -91,14 +89,14 @@ class TestCaseTest(TestCase):
 
 class TestBrokenTearDown(TestCase):
     def teardown(self):
-        raise Exception('teardown broken!')
+        raise Exception
 
     def test_method(self):
         pass
 
 class TestBrokenSetUp(TestCase):
     def setup(self):
-        raise Exception('setup broken!')
+        raise Exception
 
     def test_method(self):
         pass
