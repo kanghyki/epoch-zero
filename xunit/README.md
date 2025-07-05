@@ -2,4 +2,4 @@
 
 -   Arrange
 -   Act
--   ASSERT
+-   Assert
