@@ -1,4 +1,3 @@
-from numpy import exp
 from xunit import xunit
 from transformer2d import *
 
