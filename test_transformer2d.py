@@ -1,3 +1,4 @@
+from numpy import exp
 from xunit import xunit
 from transformer2d import *
 
@@ -6,16 +7,36 @@ class TestGeoTransformation(xunit.TestCase):
         self.t2d = Transformer2D()
 
     def test_rotate(self):
-        self.t2d.rotate()
-        pass
+        vectors = [
+            ((1, 0), (0, 1)),
+            ((3, 0), (0, 3)),
+            ((5, 0), (0, 5)),
+            ((5, 2), (-2, 5))
+        ]
+
+        for input, expect in vectors:
+            vec = np.array(input)
+            actual = self.t2d.rotate(vec, 90.0)
+            expect = np.array(expect)
+
+            assert(np.allclose(actual, expect))
 
     def test_scale(self):
-        self.t2d.scale()
-        pass
+        vec = np.array([1,2])
+
+        actual = self.t2d.scale(vec, 2.0)
+        expect = np.array([2, 4])
+
+        assert(np.array_equal(actual, expect))
 
     def test_translate(self):
-        self.t2d.translate()
-        pass
+        vec = np.array([1, 2])
+        offset = np.array([1.5, 3.2])
+
+        actual = self.t2d.translate(vec, offset)
+        expect = np.array([2.5, 5.2])
+
+        assert(np.array_equal(actual, expect))
 
 result = xunit.TestResult()
 suite = xunit.TestSuite()
