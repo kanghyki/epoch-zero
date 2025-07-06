@@ -14,8 +14,7 @@ class TestGeoTransformation(xunit.TestCase):
         ]
 
         for input, expect in vectors:
-            vec = np.array(input)
-            actual = self.t2d.rotate(vec, 90.0)
+            actual = self.t2d.rotate(input, 90.0)
             expect = np.array(expect)
 
             assert np.allclose(actual, expect), 'rotate error'

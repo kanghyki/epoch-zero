@@ -3,7 +3,7 @@ import transformer2d as t2d
 import numpy as np
 
 t = t2d.Transformer2D()
-v = np.array([2, 2])
+v = (2, 2)
 
 vectors = {
     'Original (2, 2)': {
@@ -15,11 +15,11 @@ vectors = {
         'color': '#d62728' # 빨강
     },
     'Scaled 3x (6, 6)': {
-        'vec': t.scale(v, 3),
+        'vec': t.scale(v, (3, 3)),
         'color': '#ff7f0e' # 주황
     },
     'Translated (3, -1)': {
-        'vec': t.translate(v, np.array([3, -1])),
+        'vec': t.translate(v, (3, -1)),
         'color': '#9467bd' # 보라
     },
 }

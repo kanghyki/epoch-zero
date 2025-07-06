@@ -4,7 +4,7 @@ class Transformer2D:
     def __init__(self):
         pass
 
-    def rotate(self, vector: np.ndarray, deg: float, clockwise: bool = False) -> np.ndarray:
+    def rotate(self, vector: tuple[float, float], deg: float, clockwise: bool = False) -> np.ndarray:
         if clockwise:
             deg = -deg
         v = np.append(np.array(vector), 1)
