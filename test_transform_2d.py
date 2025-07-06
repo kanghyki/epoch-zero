@@ -1,5 +1,5 @@
 from xunit import xunit
-from transformer2d import *
+from transform_2d import *
 
 class TestGeoTransformation(xunit.TestCase):
     def setup(self):

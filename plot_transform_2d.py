@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import transformer2d as t2d
+import transform_2d as t2d
 import numpy as np
 
 t = t2d.Transformer2D()
