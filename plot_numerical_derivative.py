@@ -9,7 +9,7 @@ x0 = 3
 grad = numerical_derivative(f, x0)
 
 x = np.linspace(0, 6, 100)
-y = f(x)
+y = f(x) # numpy vectorization
 tangent = grad * (x - x0) + f(x0)
 
 plt.plot(x, y, label='f(x) = x^2')
