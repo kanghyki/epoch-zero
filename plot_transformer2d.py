@@ -4,23 +4,43 @@ import numpy as np
 
 t = t2d.Transformer2D()
 v = (2, 2)
+rv = t.transform(v, r=90)
+sv = t.transform(v, s=(3, 3))
+tv = t.transform(v, t=(3, -1))
+tfv = t.transform(v, r = 90, s = (2, 2), t = (1, 1))
+
+def to_int_tuple(t: tuple[float, float], *, tol: float = 1e-8) -> tuple[int, int]:
+    a, b = t
+    a_rounded = round(a)
+    b_rounded = round(b)
+
+    if abs(a - a_rounded) >= tol:
+        raise ValueError(f"{a} is not close enough to an integer")
+    if abs(b - b_rounded) >= tol:
+        raise ValueError(f"{b} is not close enough to an integer")
+
+    return (int(a_rounded), int(b_rounded))
 
 vectors = {
-    'Original (2, 2)': {
+    f'Original {to_int_tuple(v)}': {
         'vec': v,
         'color': '#1f77b4' # 파랑
     },
-    'CCW Rotated 90° (-2, 2)': {
-        'vec': t.rotate(v, 90),
+    f'CCW Rotated 90° {to_int_tuple(rv)}': {
+        'vec': rv,
         'color': '#d62728' # 빨강
     },
-    'Scaled 3x (6, 6)': {
-        'vec': t.scale(v, (3, 3)),
+    f'Scaled 3x {to_int_tuple(sv)}': {
+        'vec': sv,
         'color': '#ff7f0e' # 주황
     },
-    'Translated (3, -1)': {
-        'vec': t.translate(v, (3, -1)),
+    f'Translated {to_int_tuple(tv)}': {
+        'vec': tv,
         'color': '#9467bd' # 보라
+    },
+    f'Transformed {to_int_tuple(tfv)}': {
+        'vec': tfv,
+        'color': '#83c092' # 민트
     },
 }
 

@@ -1,36 +1,22 @@
+from typing import Optional
 import numpy as np
 
+Vector2D = tuple[float, float]
+
 class Transformer2D:
-    def __init__(self):
-        pass
-
-    def rotate(self, vector: tuple[float, float], deg: float, clockwise: bool = False) -> np.ndarray:
-        if clockwise:
-            deg = -deg
+    def transform(self, vector: Vector2D, r: Optional[float] = None, s: Optional[Vector2D] = None, t: Optional[Vector2D] = None) -> tuple[float, float]:
         v = np.append(np.array(vector), 1)
-        R = self.__rotation_matrix(deg)
+        R = self.__rotation_matrix(0)
+        S = self.__scale_matrix((1, 1))
+        T = self.__translation_matrix((0, 0))
+        if r:
+            R = self.__rotation_matrix(r)
+        if s:
+            S = self.__scale_matrix(s)
+        if t:
+            T = self.__translation_matrix(t)
 
-        return (R @ v)[:2]
-
-    def scale(self, vector: tuple[float, float], factor: tuple[float, float]) -> np.ndarray:
-        v = np.append(np.array(vector), 1)
-        S = self.__scale_matrix(factor)
-
-        return (S @ v)[:2]
-
-    def translate(self, vector: tuple[float, float], offset: tuple[float, float]) -> np.ndarray:
-        v = np.append(np.array(vector), 1)
-        T = self.__translation_matrix(offset)
-
-        return (T @ v)[:2]
-
-    def transform(self, vector: tuple[float, float], rotation: float, scale: tuple[float, float], translation: tuple[float, float]) -> np.ndarray:
-        v = np.append(np.array(vector), 1)
-        R = self.__rotation_matrix(rotation)
-        S = self.__scale_matrix(scale)
-        T = self.__translation_matrix(translation)
-
-        return (T @ S @ R @ v)[:2]
+        return tuple((T @ S @ R @ v)[:2])
 
     def __rotation_matrix(self, deg: float) -> np.ndarray:
         rad = np.deg2rad(deg)
@@ -40,14 +26,14 @@ class Transformer2D:
             [0          ,  0          , 1]
             ])
 
-    def __scale_matrix(self, s: tuple[float, float]) -> np.ndarray:
+    def __scale_matrix(self, s: Vector2D) -> np.ndarray:
         return np.array([
             [s[0], 0   , 0],
             [0   , s[1], 0],
             [0   , 0   , 1]
             ])
 
-    def __translation_matrix(self, offset: tuple[float, float]) -> np.ndarray:
+    def __translation_matrix(self, offset: Vector2D) -> np.ndarray:
         return np.array([
             [1, 0, offset[0]],
             [0, 1, offset[1]],
