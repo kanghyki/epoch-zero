@@ -16,8 +16,10 @@ class TestResult:
         self.run_count = 0
         self.was_tear_down_broken = False
         self.was_setup_broken = False
-        self.str_error_msg = ''
+
         self.failure_indices = []
+        self.failure_exceptions = []
+
         self.class_names = []
         self.method_names = []
 
@@ -26,8 +28,9 @@ class TestResult:
         self.method_names.append(methodName)
         self.run_count = self.run_count + 1
 
-    def test_failed(self):
+    def test_failed(self, e: Exception):
         self.failure_indices.append(self.run_count - 1)
+        self.failure_exceptions.append(e)
 
     def teardown_broken(self):
         self.was_tear_down_broken = True
@@ -47,11 +50,17 @@ class TestResult:
         det = ''
         for i in range(0, self.run_count):
             ret = ''
+            reason = None
             if i in self.failure_indices:
+                failure_indices_idx = self.failure_indices.index(i)
+                exception = self.failure_exceptions[failure_indices_idx]
+                reason = str(exception)
                 ret = 'failed'
             else:
                 ret = 'pass'
             det = det + f"[{ret:^8}] {self.class_names[i]} > {self.method_names[i]}\n"
+            if reason:
+                det = det + f"{reason}\n"
         return det;
 
 class TestCase:
@@ -78,8 +87,8 @@ class TestCase:
             method = getattr(self, self.name)
             method()
 
-        except:
-            result.test_failed()
+        except Exception as e:
+            result.test_failed(e)
 
         try:
             self.teardown()

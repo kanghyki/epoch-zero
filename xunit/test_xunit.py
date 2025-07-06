@@ -48,7 +48,7 @@ class TestCaseTest(TestCase):
     def test_failed_resultFormatting(self):
         result = TestResult()
         result.test_started('class', 'method')
-        result.test_failed()
+        result.test_failed(Exception())
         assert("1 run, 1 failed" == result.summary())
 
     def test_suite(self):
@@ -87,6 +87,22 @@ class TestCaseTest(TestCase):
 [ failed ] WasRun > test_broken_method
 ''' == result.detail())
 
+    def test_broken_with_msg(self):
+        test = TestBrokenWithMsg('test_broken_with_msg')
+        result = TestResult()
+
+        test.run(result)
+        expect = '''[ failed ] TestBrokenWithMsg > test_broken_with_msg
+It's not equal
+'''
+
+        assert expect == result.detail(), f"""
+expect: '{expect}'
+actual: '{result.detail()}'"""
+
+
+
+
 class TestBrokenTearDown(TestCase):
     def teardown(self):
         raise Exception
@@ -101,6 +117,10 @@ class TestBrokenSetUp(TestCase):
     def test_method(self):
         pass
 
+class TestBrokenWithMsg(TestCase):
+    def test_broken_with_msg(self):
+        assert 1 == 0, "It's not equal"
+
 suite = TestSuite()
 
 suite.add(TestCaseTest("test_template_method"))
@@ -111,6 +131,7 @@ suite.add(TestCaseTest("test_suite"))
 suite.add(TestCaseTest("test_broken_teardown"))
 suite.add(TestCaseTest("test_broken_setup"))
 suite.add(TestCaseTest("test_result_detail"))
+suite.add(TestCaseTest("test_broken_with_msg"))
 
 result = TestResult()
 suite.run(result)
