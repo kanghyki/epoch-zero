@@ -26,7 +26,7 @@ class TestGeoTransformation(xunit.TestCase):
         actual = self.t2d.scale(vec, 2.0)
         expect = np.array([2, 4])
 
-        assert np.array_equal(actual, expect), "scale error"
+        assert np.allclose(actual, expect), "scale error"
 
     def test_translate(self):
         vec = np.array([1, 2])
@@ -35,16 +35,13 @@ class TestGeoTransformation(xunit.TestCase):
         actual = self.t2d.translate(vec, offset)
         expect = np.array([2.5, 5.2])
 
-        assert np.array_equal(actual, expect), "translate error"
+        assert np.allclose(actual, expect), "translate error"
 
     def test_transform(self):
-        vec = np.array([1, 0])
-
-        actual = self.t2d.transform(vec, rotation=90, scale=(2, 2), translation=(1, 1))
-        print(type(actual))
+        actual = self.t2d.transform((1, 0), rotation=90, scale=(2, 2), translation=(1, 1))
         # [0,1] -> [0,2] -> [1,3]
         expect = np.array([1, 3])
-        assert np.array_equal(actual, expect), f"""actual: {actual}
+        assert np.allclose(actual, expect), f"""actual: {actual}
 expect: {expect}"""
 
 result = xunit.TestResult()
