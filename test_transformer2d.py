@@ -16,19 +16,22 @@ class TestGeoTransformation(xunit.TestCase):
         for input, expect in vectors:
             actual = self.t2d.transform(input, r=90.0)
 
-            assert np.allclose(actual, expect), 'rotate error'
+            assert np.allclose(actual, expect), f"""actual: {actual}
+expect: {expect}"""
 
     def test_scale(self):
         actual = self.t2d.transform((1, 2), s=(2, 2))
         expect = (2, 4)
 
-        assert np.allclose(actual, expect), "scale error"
+        assert np.allclose(actual, expect), f"""actual: {actual}
+expect: {expect}"""
 
     def test_translate(self):
         actual = self.t2d.transform((1, 2), t=(1.5, 3.2))
         expect = (2.5, 5.2)
 
-        assert np.allclose(actual, expect), "translate error"
+        assert np.allclose(actual, expect), f"""actual: {actual}
+expect: {expect}"""
 
     def test_transform(self):
         actual = self.t2d.transform((1, 0), r=90, s=(2, 2), t=(1, 1))
