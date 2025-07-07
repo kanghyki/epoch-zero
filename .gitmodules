@@ -1,3 +1,4 @@
 [submodule "xunit"]
 	path = xunit
 	url = git@github.com:kanghyki/xunit.git
+	ignore = dirty
