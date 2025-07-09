@@ -36,11 +36,28 @@ expect: {expect}
 expect: {expect}
 """
 
+    def test_gradient_descent(self):
+        epoch = 100
+        rate = 0.1
+        data = np.array([3.0, 4.0])
+
+        for _ in range(epoch):
+            grad = numerical_gradient(self.f, data)
+            data = data - grad * rate
+            print(data)
+
+        expect = np.array([0.0, 0.0])
+        assert np.allclose(data, expect), f"""actual: {data}
+expect: {expect}
+"""
+
+
 result = xunit.TestResult()
 suite = xunit.TestSuite()
 
 suite.add(TestNumericalGradient('test_partial_derivative'))
 suite.add(TestNumericalGradient('test_gradient'))
+suite.add(TestNumericalGradient('test_gradient_descent'))
 
 suite.run(result)
 print(result.detail())
