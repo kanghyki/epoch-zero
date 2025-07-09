@@ -44,7 +44,6 @@ expect: {expect}
         for _ in range(epoch):
             grad = numerical_gradient(self.f, data)
             data = data - grad * rate
-            print(data)
 
         expect = np.array([0.0, 0.0])
         assert np.allclose(data, expect), f"""actual: {data}
