@@ -68,3 +68,9 @@ start = np.array([1.5, 1.5])
 path = gradient_descent(f3, start, lr = 1, steps = 10)
 plot_path_3d(f3, path)
 plot_path_2d(f3, path)
+
+def f4(x):  # 비선형 함수
+    return x[0]**2 - x[1]**2
+
+path = gradient_descent(f4, start)
+plot_path_2d(f4, path)
