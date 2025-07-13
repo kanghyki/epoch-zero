@@ -1,10 +1,12 @@
 import numpy as np
 
 class MLP:
-    def __init__(self, layers, activation, activation_grad):
+    def __init__(self, layers, activation, activation_grad, loss_fn, loss_grad):
         self.layers = layers
         self.activation = activation
         self.activation_grad = activation_grad
+        self.loss_fn = loss_fn
+        self.loss_grad = loss_grad
         self.weights = []
         self.biases = []
 
@@ -25,7 +27,7 @@ class MLP:
             self.activations.append(a)
         # 출력층 (sigmoid 고정)
         z = a @ self.weights[-1] + self.biases[-1]
-        a = 1 / (1 + np.exp(-z))  # sigmoid
+        a = 1 / (1 + np.exp(-z))
         self.zs.append(z)
         self.activations.append(a)
         return a
@@ -35,8 +37,9 @@ class MLP:
         self.dw = [None] * len(self.weights)
         self.db = [None] * len(self.biases)
 
-        # 출력층
-        dz = (self.activations[-1] - y_true) * self.activations[-1] * (1 - self.activations[-1])
+        # 출력층 gradient (손실 함수 기반)
+        dz = self.loss_grad(y_true, self.activations[-1]) * self.activations[-1] * (1 - self.activations[-1])
+
         for i in reversed(range(len(self.weights))):
             a_prev = self.activations[i]
             self.dw[i] = a_prev.T @ dz / m
@@ -53,7 +56,7 @@ class MLP:
         history = []
         for _ in range(epochs):
             y_pred = self.forward(X)
-            loss = np.mean((y - y_pred) ** 2)
+            loss = self.loss_fn(y, y_pred)
             history.append(loss)
             self.backward(y)
             self.update(lr)

@@ -1,6 +1,7 @@
 import numpy as np
 from mlp import MLP
 import activation as act
+import loss
 
 # XOR 데이터
 X = np.array([
@@ -17,7 +18,7 @@ y = np.array([
 ])
 
 # 모델 생성
-model = MLP([2, 4, 1], act.sigmoid, act.sigmoid_grad)
+model = MLP([2, 4, 1], act.sigmoid, act.sigmoid_grad, loss.mse, loss.mse_grad)
 
 # 학습 수행
 losses = model.train(X, y, epochs=10000, lr=0.1)
