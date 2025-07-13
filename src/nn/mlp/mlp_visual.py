@@ -31,4 +31,4 @@ def draw_network(layer_sizes):
     plt.title("MLP structure visualization")
     plt.show()
 
-draw_network([2, 4, 4, 1])
+draw_network([2, 4, 4, 4, 4, 1])
