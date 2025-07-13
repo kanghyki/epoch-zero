@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from mlp import MLP
+import activation as act
 
 X = np.array([
     [0, 0],
@@ -25,7 +26,7 @@ structures = {
 
 for name, layers in structures.items():
     print(f"\n===== 구조: {name} =====")
-    mlp = MLP(layers)
+    mlp = MLP(layers, act.sigmoid, act.sigmoid_grad)
     losses = mlp.train(X, y, epochs=10000, lr=0.1)
     print(f"최종 손실: {losses[-1]:.4f}")
     plt.plot(losses, label=name)

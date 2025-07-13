@@ -1,5 +1,6 @@
 import numpy as np
 from mlp import MLP
+import activation as act
 
 # XOR 데이터
 X = np.array([
@@ -16,10 +17,10 @@ y = np.array([
 ])
 
 # 모델 생성
-model = MLP([2, 4, 4, 4, 4, 1])
+model = MLP([2, 4, 1], act.sigmoid, act.sigmoid_grad)
 
 # 학습 수행
-losses = model.train(X, y, epochs=100000, lr=0.1)
+losses = model.train(X, y, epochs=10000, lr=0.1)
 
 # 예측
 predictions = model.predict(X)
@@ -33,4 +34,4 @@ print("\n예측:")
 print(predictions)
 
 # 최종 손실
-print("\n최종 손실:", round(losses[-1], 4))
+print(f"최종 손실: {losses[-1]:.4f}")
